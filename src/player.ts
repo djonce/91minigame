@@ -155,11 +155,7 @@ el('save-file').addEventListener('change', () => {
   });
 });
 const gamepad = bindGamepad({ send: (button, down) => runtime.input(button, down), enabled: () => started && !busy && !menuOpen && !runtime.paused, menu: () => { if (!busy) { menuOpen ? resumeGame() : openMenu(); } } });
-const layout = bindPlayerLayout(preferences, releaseInputs);
-el<HTMLSelectElement>('control-size').value = preferences.size;
-el<HTMLSelectElement>('control-hand').value = preferences.handed;
-el('control-size').addEventListener('change', () => { preferences.size = el<HTMLSelectElement>('control-size').value === 'large' ? 'large' : 'standard'; layout.update(); writePreferences(preferences); });
-el('control-hand').addEventListener('change', () => { preferences.handed = el<HTMLSelectElement>('control-hand').value === 'left' ? 'left' : 'right'; layout.update(); writePreferences(preferences); });
+bindPlayerLayout(preferences, releaseInputs);
 applyAudio();
 el('pause-menu').addEventListener('keydown', event => {
   if (event.key !== 'Tab') return;

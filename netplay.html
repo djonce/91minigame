@@ -22,12 +22,13 @@
           <div id="waiting-overlay" class="pause-label">等待开始</div>
         </div></div>
         <div class="controller" aria-label="游戏手柄">
-          <div class="dpad" role="group" aria-label="八方向触控盘">
+          <div class="dpad" role="group" aria-label="固定八方向摇杆">
             <button type="button" data-input="up" aria-label="方向上" aria-pressed="false">▲</button>
             <button type="button" data-input="left" aria-label="方向左" aria-pressed="false">◀</button>
-            <span aria-hidden="true"></span>
+            <span class="dpad-center" aria-hidden="true"></span>
             <button type="button" data-input="right" aria-label="方向右" aria-pressed="false">▶</button>
             <button type="button" data-input="down" aria-label="方向下" aria-pressed="false">▼</button>
+            <span class="joystick-thumb" aria-hidden="true"></span>
           </div>
           <div class="system-buttons"><button type="button" data-input="select" aria-pressed="false">SELECT</button><button type="button" data-input="start" aria-pressed="false">START</button></div>
           <div class="action-buttons"><button type="button" data-input="b" aria-label="B 键" aria-pressed="false">B</button><button type="button" data-input="a" aria-label="A 键" aria-pressed="false">A</button></div>
@@ -54,6 +55,11 @@
           <div class="room-actions"><button id="return-game" class="tool-button" hidden>返回画面</button><button id="leave-room" class="tool-button">退出房间</button><button id="sound" class="tool-button">♪ 声音开</button></div>
           <details class="game-details"><summary>连接信息</summary><p id="connection-stats"></p></details>
         </section>
+        <fieldset class="control-settings"><legend>手柄设置</legend>
+          <label>按键大小<select id="control-size"><option value="standard">标准</option><option value="large">大号</option></select></label>
+          <label>手柄布局<select id="control-hand"><option value="right">方向控制在左</option><option value="left">方向控制在右</option></select></label>
+          <label>方向控制<select id="control-direction"><option value="joystick">固定摇杆</option><option value="dpad">十字键</option></select></label>
+        </fieldset>
         <p class="room-note">测试版 · 本卡带支持双人，可再邀请一位朋友观战。进入游戏后，请在游戏菜单选择双人模式。切到后台会暂停这一局。</p>
         <p id="room-error" role="alert" hidden></p>
       </div>

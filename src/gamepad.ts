@@ -1,12 +1,19 @@
 import type { Input } from './runtime-adapter';
 import { bindPlayerGestures } from './player-gestures';
 
-export function directionAt(x: number, y: number, width: number, height: number): Input[] {
+const sectors: Input[][] = [['right'], ['right', 'down'], ['down'], ['down', 'left'], ['left'], ['left', 'up'], ['up'], ['up', 'right']];
+export function directionAt(x: number, y: number, width: number, height: number, previous: readonly Input[] = []): Input[] {
   const dx = (x / width - 0.5) * 2;
   const dy = (y / height - 0.5) * 2;
   if (Math.hypot(dx, dy) < 0.2) return [];
-  const sectors: Input[][] = [['right'], ['right', 'down'], ['down'], ['down', 'left'], ['left'], ['left', 'up'], ['up'], ['up', 'right']];
-  return sectors[(Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) + 8) % 8];
+  const angle = Math.atan2(dy, dx);
+  const last = sectors.findIndex(inputs => inputs.length === previous.length && inputs.every(input => previous.includes(input)));
+  if (last !== -1) {
+    const difference = angle - last * Math.PI / 4;
+    // Five degrees of hysteresis prevent thumb jitter at sector boundaries.
+    if (Math.abs(Math.atan2(Math.sin(difference), Math.cos(difference))) <= Math.PI / 8 + Math.PI / 36) return sectors[last];
+  }
+  return sectors[(Math.round(angle / (Math.PI / 4)) + 8) % 8];
 }
 
 // Aggregate sources before sending edges: releasing one finger must not cancel
@@ -41,18 +48,36 @@ export function bindGamepad(options: { send(button: Input, down: boolean): void;
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const set = (source: string, buttons: Input[]) => states.set(source, options.enabled() ? buttons : []);
   const dpad = document.querySelector<HTMLElement>('.dpad')!;
+  let directionInputs: Input[] = [];
+  function centerStick() {
+    directionInputs = [];
+    dpad.style.setProperty('--stick-x', '0px');
+    dpad.style.setProperty('--stick-y', '0px');
+    dpad.classList.remove('dragging');
+  }
   function direction(event: PointerEvent) {
     if (pointers.get(event.pointerId) !== dpad) return;
     const box = dpad.getBoundingClientRect();
-    set(`pointer-${event.pointerId}`, directionAt(event.clientX - box.left, event.clientY - box.top, box.width, box.height));
+    const joystick = document.body.dataset.direction === 'joystick';
+    directionInputs = directionAt(event.clientX - box.left, event.clientY - box.top, box.width, box.height, joystick ? directionInputs : []);
+    set(`pointer-${event.pointerId}`, directionInputs);
+    if (joystick) {
+      const dx = event.clientX - box.left - box.width / 2;
+      const dy = event.clientY - box.top - box.height / 2;
+      const travel = Math.min(box.width, box.height) * 0.27;
+      const scale = Math.min(1, travel / (Math.hypot(dx, dy) || 1));
+      dpad.style.setProperty('--stick-x', `${dx * scale}px`);
+      dpad.style.setProperty('--stick-y', `${dy * scale}px`);
+    }
   }
   dpad.addEventListener('pointerdown', event => {
     if (!options.enabled() || [...pointers.values()].includes(dpad)) return;
     event.preventDefault();
-    pointers.set(event.pointerId, dpad); dpad.setPointerCapture(event.pointerId); direction(event);
+    pointers.set(event.pointerId, dpad); dpad.setPointerCapture(event.pointerId); dpad.classList.add('dragging'); direction(event);
   });
   dpad.addEventListener('pointermove', direction);
   const releasePointer = (event: PointerEvent) => {
+    if (pointers.get(event.pointerId) === dpad) centerStick();
     pointers.delete(event.pointerId); states.set(`pointer-${event.pointerId}`, []);
   };
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'] as const) dpad.addEventListener(type, releasePointer);
@@ -89,6 +114,7 @@ export function bindGamepad(options: { send(button: Input, down: boolean): void;
   return {
     release() {
       states.release();
+      centerStick();
       for (const [id, element] of pointers) if (element.hasPointerCapture(id)) element.releasePointerCapture(id);
       pointers.clear();
       for (const timer of timers) clearTimeout(timer);

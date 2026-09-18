@@ -59,6 +59,85 @@ test('WebKit gesture and selection defaults are blocked only on game surfaces', 
   await expect(page.locator('#room-code')).toHaveValue('ABCDEF1234');
 });
 
+test('fixed joystick follows eight directions, clamps travel and centers after release or menu', async ({ page }) => {
+  await start(page);
+  await expect(page.locator('body')).toHaveAttribute('data-direction', 'joystick');
+  const pad = page.locator('.dpad');
+  const box = (await pad.boundingBox())!;
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+  const offset = () => pad.evaluate(node => ({ x: parseFloat((node as HTMLElement).style.getPropertyValue('--stick-x') || '0'), y: parseFloat((node as HTMLElement).style.getPropertyValue('--stick-y') || '0') }));
+  await page.mouse.move(cx, cy); await page.mouse.down();
+  await expect(page.locator('.pressed')).toHaveCount(0);
+  const sectors = [['right'], ['right', 'down'], ['down'], ['down', 'left'], ['left'], ['left', 'up'], ['up'], ['up', 'right']];
+  for (let i = 0; i < sectors.length; i++) {
+    const angle = i * Math.PI / 4;
+    await page.mouse.move(cx + Math.cos(angle) * box.width * .4, cy + Math.sin(angle) * box.height * .4);
+    expect(await pad.locator('.pressed').evaluateAll(nodes => nodes.map(node => (node as HTMLElement).dataset.input).sort())).toEqual([...sectors[i]].sort());
+    const position = await offset();
+    expect(Math.hypot(position.x, position.y)).toBeCloseTo(box.width * .27, 1);
+  }
+  await page.mouse.move(cx + box.width, cy); // Captured finger outside the base.
+  await expect(page.locator('[data-input=right]')).toHaveClass(/pressed/);
+  await page.mouse.up();
+  await expect(page.locator('.pressed')).toHaveCount(0);
+  expect(await offset()).toEqual({ x: 0, y: 0 });
+  await page.mouse.move(cx + box.width * .35, cy); await page.mouse.down();
+  await page.mouse.move(cx + 2, cy + 2); await expect(page.locator('.pressed')).toHaveCount(0);
+  await page.mouse.move(cx, cy - box.height * .35);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.locator('.pressed')).toHaveCount(0);
+  expect(await offset()).toEqual({ x: 0, y: 0 });
+  await page.mouse.up();
+  await page.locator('#control-direction').selectOption('dpad');
+  await page.locator('#resume').tap();
+  await expect(page.locator('.joystick-thumb')).toBeHidden();
+  await page.locator('[data-input=right]').tap();
+  await expect(page.locator('.pressed')).toHaveCount(0);
+  await page.reload(); await expect(page.locator('#launch')).toBeEnabled({ timeout: 70000 });
+  await expect(page.locator('body')).toHaveAttribute('data-direction', 'dpad');
+  await page.goto('/netplay.html?game=nes-chise-yaosai');
+  await expect(page.locator('#control-direction')).toHaveValue('dpad');
+  await page.locator('#control-direction').selectOption('joystick');
+  await expect(page.locator('body')).toHaveAttribute('data-direction', 'joystick');
+});
+
+test('landscape A and B have a wide diagonal gap for both hand layouts and sizes', async ({ page }, info) => {
+  await start(page);
+  for (const size of [{ width: 568, height: 320 }, { width: 667, height: 300 }, { width: 844, height: 390 }, { width: 932, height: 360 }]) {
+    await page.setViewportSize(size);
+    await expect.poll(() => page.evaluate(() => Math.round(document.body.getBoundingClientRect().width))).toBe(size.width);
+    for (const hand of ['right', 'left']) for (const buttonSize of ['standard', 'large']) {
+      await page.locator('#pause').tap();
+      await page.locator('#control-hand').selectOption(hand);
+      await page.locator('#control-size').selectOption(buttonSize);
+      await page.locator('#resume').tap();
+      const a = (await page.locator('[data-input=a]').boundingBox())!;
+      const b = (await page.locator('[data-input=b]').boundingBox())!;
+      const screen = (await page.locator('.screen-stage').boundingBox())!;
+      const centerGap = Math.hypot(a.x - b.x, a.y - b.y);
+      expect(centerGap - a.width).toBeCloseTo(28, 0);
+      expect(a.y + 40).toBeLessThan(b.y);
+      expect(b.x + b.width).toBeLessThan(a.x); // Non-overlapping rectangular hit targets too.
+      for (const box of [a, b]) {
+        expect(box.x).toBeGreaterThanOrEqual(0); expect(box.x + box.width).toBeLessThanOrEqual(size.width);
+        expect(box.y).toBeGreaterThanOrEqual(0); expect(box.y + box.height).toBeLessThanOrEqual(size.height);
+        if (hand === 'right') expect(box.x).toBeGreaterThanOrEqual(screen.x + screen.width);
+        else expect(box.x + box.width).toBeLessThanOrEqual(screen.x);
+      }
+      expect(await page.evaluate(() => ({ width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }))).toEqual(size);
+    }
+  }
+  await page.locator('#pause').tap();
+  await page.locator('#control-hand').selectOption('right'); await page.locator('#control-size').selectOption('standard');
+  await page.locator('#resume').tap();
+  await page.screenshot({ path: info.outputPath('joystick-landscape.png') });
+  await page.setViewportSize({ width: 390, height: 740 });
+  await expect(page.locator('body')).toHaveAttribute('data-layout', 'portrait');
+  await expect.poll(() => page.evaluate(() => ({ scale: visualViewport?.scale, inner: innerWidth, root: document.documentElement.clientWidth, body: Math.round(document.body.getBoundingClientRect().width) }))).toEqual({ scale: 1, inner: 390, root: 390, body: 390 });
+  await page.screenshot({ path: info.outputPath('joystick-portrait.png') });
+});
+
 test('pinching across controls cannot zoom or interrupt simultaneous input', async ({ page, browserName }) => {
   test.skip(browserName !== 'chromium', 'Real multi-touch injection uses Chromium CDP; WebKit fallback is checked separately.');
   await start(page);
