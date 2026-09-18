@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#171c19">
+  <title>像素游乐室 · 玩家一号</title>
+</head>
+<body class="player-body">
+  <div id="player-workspace">
+    <header class="player-header">
+      <a class="back-link" href="/" aria-label="返回游戏库">← 游戏库</a>
+      <strong id="game-title">正在读取卡带</strong><span class="player-chip">NES</span>
+    </header>
+    <main class="play-layout">
+      <section class="play-area" aria-label="游戏画面与手柄">
+        <div class="play-meta"><span class="player-number">1P</span><span id="play-status" role="status">准备中</span></div>
+        <button id="pause" class="tool-button menu-trigger" disabled aria-haspopup="dialog" aria-controls="pause-menu">Ⅱ 菜单</button>
+        <div class="screen-slot"><div class="screen-stage">
+          <div id="emulator"></div>
+          <div id="launch-overlay" class="screen-overlay">
+            <p class="eyebrow">READY, PLAYER ONE?</p><h1 id="launch-title">正在准备卡带</h1>
+            <p id="load-message" role="status">检查本地运行环境…</p>
+            <button id="launch" class="button primary" disabled>开始游戏 ↗</button>
+            <a id="retry" class="retry" href="" hidden>重新加载</a>
+          </div>
+          <div id="paused-overlay" class="pause-label" hidden>已暂停</div>
+        </div></div>
+        <div class="controller" aria-label="游戏手柄">
+          <div class="dpad" role="group" aria-label="八方向触控盘">
+            <button type="button" data-input="up" aria-label="方向上" aria-pressed="false">▲</button>
+            <button type="button" data-input="left" aria-label="方向左" aria-pressed="false">◀</button>
+            <span aria-hidden="true"></span>
+            <button type="button" data-input="right" aria-label="方向右" aria-pressed="false">▶</button>
+            <button type="button" data-input="down" aria-label="方向下" aria-pressed="false">▼</button>
+          </div>
+          <div class="system-buttons"><button type="button" data-input="select" aria-pressed="false">SELECT</button><button type="button" data-input="start" aria-pressed="false">START</button></div>
+          <div class="action-buttons"><button type="button" data-input="b" aria-label="B 键" aria-pressed="false">B</button><button type="button" data-input="a" aria-label="A 键" aria-pressed="false">A</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="pause-menu" class="menu-layer" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
+    <section class="menu-sheet">
+      <header class="menu-heading"><div><p class="eyebrow">PLAYER ONE</p><h2 id="menu-title">歇一下，接着玩</h2></div><button id="resume" class="button primary">继续游戏</button></header>
+      <div class="menu-scroll">
+        <div class="player-toolbar"><button id="quick-save" class="tool-button" disabled>↓ 快速存档</button><button id="quick-load" class="tool-button" disabled>↶ 读取快存</button><button id="mute" class="tool-button" disabled aria-pressed="false">♪ 声音开</button></div>
+        <fieldset class="control-settings"><legend>手柄与声音</legend>
+          <label>按键大小<select id="control-size"><option value="standard">标准</option><option value="large">大号</option></select></label>
+          <label>手柄布局<select id="control-hand"><option value="right">方向盘在左</option><option value="left">方向盘在右</option></select></label>
+          <label class="volume-setting">音量 <output id="volume-value" for="volume">65%</output><input id="volume" type="range" min="0" max="100" value="65" aria-label="游戏音量"></label>
+        </fieldset>
+        <section class="save-panel" aria-labelledby="save-title"><div class="section-heading"><h2 id="save-title">随时，接着玩</h2><span class="local-badge">本地存档</span></div><div id="slots"></div>
+          <p class="save-note">存档保存在当前浏览器，清除浏览器数据会移除存档。可以导出一份备份。</p>
+          <button id="import-save" class="button import-button" disabled>↑ 导入存档备份</button><input id="save-file" type="file" accept=".json,application/json" hidden>
+        </section>
+        <div class="menu-footer"><button id="restart" class="tool-button" disabled>↻ 重新开始</button><a class="tool-button" href="/">返回游戏库</a></div>
+        <p class="keyboard-hint">方向键移动 · Z = B · X = A · Enter 开始 · Shift 选择 · Esc 菜单</p>
+        <details class="game-details"><summary>卡带信息</summary><div id="rom-info"></div></details>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script type="module" src="/src/player.ts"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { resolve, basename } from 'node:path';
+import { inspectNes } from '../shared/nes';
+import { entries, root } from '../server/catalog';
+const [file, id, title] = process.argv.slice(2);
+if (!file || !id || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(id)) throw new Error('用法：pnpm rom:add "/绝对路径/game.nes" game-id "游戏名称"，ID 仅限小写字母、数字和连字符。');
+const path = resolve(file);
+const inspection = inspectNes(await readFile(path));
+const games = await entries();
+if (games.some(game => game.id === id)) throw new Error(`游戏 ID 已存在：${id}。请在 .local/games.json 中编辑该条目。`);
+games.push({ id, title: title || basename(file, '.nes'), path });
+await mkdir(resolve(root, '.local'), { recursive: true });
+await writeFile(resolve(root, '.local/games.json'), JSON.stringify(games, null, 2) + '\n');
+console.log(`已登记 ${id}，${inspection.sizeBytes} 字节。只记录路径，未复制 ROM。刷新游戏库即可看到。`);

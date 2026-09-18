@@ -1,0 +1,15 @@
+import { execFileSync } from 'node:child_process';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+const root = resolve(import.meta.dirname, '..');
+const release = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 15);
+const output = resolve(root, '.deploy');
+await mkdir(output, { recursive: true });
+const archive = resolve(output, `minigames-${release}.tar.gz`);
+const files = ['Dockerfile', '.dockerignore', 'package.json', 'build', 'dist', 'config/runtime-lock.json', '.runtime/emulatorjs/4.2.3', 'scripts/verify-runtime.mjs', 'THIRD_PARTY_NOTICES.md', 'deploy'];
+const archiveOptions = process.platform === 'darwin' ? ['--no-xattrs', '--no-mac-metadata'] : [];
+execFileSync('tar', [...archiveOptions, '-czf', archive, ...files], { cwd: root, env: { ...process.env, COPYFILE_DISABLE: '1' }, stdio: 'inherit' });
+const sha256 = createHash('sha256').update(await readFile(archive)).digest('hex');
+await writeFile(resolve(output, 'latest.json'), JSON.stringify({ release, archive, sha256 }, null, 2) + '\n');
+console.log(JSON.stringify({ release, archive, sha256 }));

@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f4ed"><title>像素游乐室 · 游戏库</title></head>
+<body><div class="app-shell">
+  <aside class="sidebar"><a class="brand" href="/" aria-label="像素游乐室首页"><span class="brand-icon">▦</span><span>像素游乐室<small>PIXEL ROOM</small></span></a><nav aria-label="主导航"><a class="nav-item active" href="#library">▦ <span>我的游戏库</span></a><a class="nav-item" href="#saves">◷ <span>本地存档</span><span id="save-count" class="count">0</span></a><a class="nav-item" href="#settings">⚙ <span>设置</span></a></nav><div class="sidebar-bottom"><span class="status-dot"></span> 体验版<small>好玩的时光，随时继续。</small></div></aside>
+  <main class="main"><header class="topbar"><span>你的私人街机角落</span><span class="pill"><i class="status-dot"></i> PRESS START</span></header>
+  <section id="library" class="view"><div class="page-heading"><div><p class="eyebrow">PRESS START, FEEL GOOD.</p><h1>快乐，读档中<span class="lime-dot">.</span></h1><p class="muted">熟悉的像素，新的冒险。从一张卡带开始。</p></div><span class="library-mark" aria-hidden="true">✳</span></div>
+    <div class="section-heading"><h2>我的游戏库 <span id="game-count">—</span></h2><span class="filter-pill">NES / FC</span></div><div id="library-notice" role="status"></div><div id="games" class="game-grid"><p class="muted">正在读取卡带…</p></div>
+    <div class="info-strip"><span class="info-icon">↳</span><div><strong>游戏单独加载，进度留在本机。</strong><p>按开始键出发。离开前记得存档，下次接着玩。</p></div><span class="key-decoration" aria-hidden="true">START</span></div>
+  </section>
+  <section id="saves" class="view" hidden><div class="page-heading"><div><p class="eyebrow">PICK UP WHERE YOU LEFT OFF.</p><h1>时光存档<span class="lime-dot">.</span></h1><p class="muted">这里保存着这台设备、当前浏览器中的游戏进度。</p></div></div><div id="save-list" class="save-list"></div></section>
+  <section id="settings" class="view" hidden><div class="page-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME.</p><h1>游乐室设置<span class="lime-dot">.</span></h1></div></div><div class="settings-card"><h2>本地存储</h2><p>清理已下载的 ROM 缓存。再次进入游戏时会重新读取，已有存档会保留。</p><button id="clear-cache" class="button secondary">清理游戏缓存</button><hr><h2>开发环境</h2><p id="runtime-info">正在检查运行环境…</p><p>微信入口已单独提供。可在当前浏览器中游玩，进度保存在本机。</p></div></section>
+  <footer class="page-footer"><span>小小像素，大大快乐。</span><span>NES COLLECTION · VOL. 01</span></footer></main>
+</div><div id="toast" class="toast" role="status" hidden></div><script type="module" src="/src/library.ts"></script></body></html>

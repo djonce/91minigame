@@ -1,0 +1,38 @@
+name: minigames
+services:
+  app:
+    image: minigames:${RELEASE_ID:?Set RELEASE_ID}
+    build:
+      context: ${RELEASE_DIR:?Set RELEASE_DIR}
+      dockerfile: Dockerfile
+    container_name: minigames-app
+    restart: unless-stopped
+    init: true
+    environment:
+      RELEASE_ID: ${RELEASE_ID}
+    ports:
+      - "127.0.0.1:5178:8080"
+    volumes:
+      - ${DATA_DIR:-/opt/minigames/data}:/data:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 100
+    stop_grace_period: 12s
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

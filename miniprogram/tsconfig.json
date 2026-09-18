@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "target": "ES2017", "module": "CommonJS", "strict": true, "types": ["miniprogram-api-typings"], "skipLibCheck": true, "lib": ["ES2017"], "sourceMap": false },
+  "include": ["**/*.ts"], "exclude": ["node_modules"]
+}
