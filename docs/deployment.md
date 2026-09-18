@@ -6,16 +6,16 @@
 
 已部署游戏目录 API、受控 ROM 下载、H5 游戏库与手机播放器、EmulatorJS 4.2.3 固定运行资源，以及不传音视频的联机房间服务。各端本地模拟，服务器通过同域 WSS `/netplay` 汇总输入。资源 API 仍只读；房间状态只保存在内存中，容器重启结束现有对局。没有网页管理后台、账号登录或云存档。
 
-当前发布：`20260918-120949`；Docker 容器健康检查通过，公网 HTTPS 健康接口已返回该版本。可访问[线上游戏库](https://minigames.19ba.cn)及[好友联机](https://minigames.19ba.cn/netplay.html?game=nes-chise-yaosai)。触控修复代码提交为 [`d2a277e`](https://github.com/djonce/91minigame/commit/d2a277e0bc6e7d173dc439259a6a34a552be1c28)，已推送 `main`。
+当前发布：`20260918-132953`；Docker 容器健康检查通过，公网 HTTPS 健康接口已返回该版本。可访问[线上游戏库](https://minigames.19ba.cn)及[好友联机](https://minigames.19ba.cn/netplay.html?game=nes-chise-yaosai)。固定摇杆与横屏 A/B 布局代码提交为 [`fc96b8f`](https://github.com/djonce/91minigame/commit/fc96b8f3c98fa381f7dd08934b0405d0e95d7d4e)，已推送 `main`。
 
 | 项目 | 值 |
 | --- | --- |
 | 目标域名 | https://minigames.19ba.cn |
 | SSH / 主机 | `ssh aliyun` / `120.55.88.226` |
 | 部署根目录 | `/opt/minigames` |
-| 当前代码目录 | `/opt/minigames/current`，指向 `releases/20260918-120949` |
+| 当前代码目录 | `/opt/minigames/current`，指向 `releases/20260918-132953` |
 | Compose 项目 / 容器 | `minigames` / `minigames-app` |
-| 镜像 | `minigames:20260918-120949` |
+| 镜像 | `minigames:20260918-132953` |
 | 容器环境 | Node.js 24.21.0，Debian bookworm slim，非 root 用户 |
 | 容器监听 / 主机映射 | `8080` / `127.0.0.1:5178` |
 | HTTPS 入口 | 既有 systemd Caddy，80/443，新增独立域名路由 |
@@ -38,7 +38,15 @@ pnpm release:package
 
 发布包路径、版本和 SHA-256 记录在 `.deploy/latest.json`。包中只有构建结果、锁定运行资源和部署配置，不包含 `node_modules`、开发源码、ROM 或存档。Mac 发布归档关闭扩展属性和 AppleDouble 元数据。
 
-本次触控修复归档：`minigames-20260918-120949.tar.gz`（1,653,186 字节），SHA-256：
+本次摇杆与布局归档：`minigames-20260918-132953.tar.gz`（1,655,795 字节），SHA-256：
+
+```text
+cd6812adb0cb49b1ab4426fac93260e449fcd750367f747ed8fafac926c82f58
+```
+
+服务器核对摘要通过，固定核心 46 个文件校验和 Docker 健康检查通过；上一版本 `20260918-120949` 保留供回滚。本次未修改 ROM 数据、核心、帧率或联机协议。
+
+此前触控修复归档：`minigames-20260918-120949.tar.gz`（1,653,186 字节），SHA-256：
 
 ```text
 13e666f7fa0af8e5676726c633d17f9c46b0bcd58f39bd3ebdd5ba0d2fb04f39
@@ -139,6 +147,16 @@ Caddy 自动申请和续期证书并将 HTTP 跳转到 HTTPS；依赖公网 DNS 
 当前 ROM 在 H5 内同源下载，原生页面仅使用 request 与 web-view；尚未增加原生 `wx.downloadFile`。微信后台设置、业务域名资格及真机测试未由本次服务器部署代为完成。
 
 ## 验收与存档迁移
+
+### 2026-09-18 固定摇杆与横屏 A/B 布局（20260918-132953）
+
+默认使用固定八方向摇杆，支持拖动、斜向、中心死区、松手回中与多指同时按 A/B。单机和联机菜单均可切换十字键并保存偏好。横屏 A 在右上、B 在左下，圆形边缘间距约 28 CSS px；触控区域不重叠，不额外压缩游戏画面宽度。同时修复横屏切回竖屏后旧宽度导致的页面缩小问题。
+
+本地验证：19 项单元测试、Chrome/WebKit 触控套件 9 项（另 1 项 WebKit CDP 多指注入跳过）、3 项真实 ROM 手机布局与双人＋观战回归、2 项生产集成测试通过；生产构建通过。实现和截图见[手机界面记录](mobile-ui-implementation.md)。
+
+正式 HTTPS 域名验收：`PLAYWRIGHT_BASE_URL=https://minigames.19ba.cn pnpm test:touch`，Chrome/WebKit 共 9 项通过、1 项跳过；覆盖真实核心输入、摇杆回中、设置持久化、横屏间距、横竖屏缩放和原有防误缩放。WebKit 的 CDP 多指项跳过，不能据此视作 iOS 微信多指验收。
+
+容器健康，公网 `/api/health` 返回 `20260918-132953`。退出游戏页后重新进入即可加载新脚本和样式，无需清除存档或重新发布小程序。本次仅调整手柄和布局，没有进行性能优化。iOS 微信真机手感仍需用户复测。
 
 ### 2026-09-18 iOS 触控修复（20260918-120949）
 
