@@ -6,16 +6,16 @@
 
 已部署游戏目录 API、受控 ROM 下载、H5 游戏库与手机播放器、EmulatorJS 4.2.3 固定运行资源，以及不传音视频的联机房间服务。各端本地模拟，服务器通过同域 WSS `/netplay` 汇总输入。资源 API 仍只读；房间状态只保存在内存中，容器重启结束现有对局。没有网页管理后台、账号登录或云存档。
 
-当前发布：`20260918-111911`；Docker 容器健康检查通过，公网 HTTPS 健康接口已返回该版本。可访问[线上游戏库](https://minigames.19ba.cn)及[好友联机](https://minigames.19ba.cn/netplay.html?game=nes-chise-yaosai)。代码提交为 [`1303d8c`](https://github.com/djonce/91minigame/commit/1303d8c8edc4207ca04e9101307b977af855f2a5)，已推送 `main`。
+当前发布：`20260918-120949`；Docker 容器健康检查通过，公网 HTTPS 健康接口已返回该版本。可访问[线上游戏库](https://minigames.19ba.cn)及[好友联机](https://minigames.19ba.cn/netplay.html?game=nes-chise-yaosai)。触控修复代码提交为 [`d2a277e`](https://github.com/djonce/91minigame/commit/d2a277e0bc6e7d173dc439259a6a34a552be1c28)，已推送 `main`。
 
 | 项目 | 值 |
 | --- | --- |
 | 目标域名 | https://minigames.19ba.cn |
 | SSH / 主机 | `ssh aliyun` / `120.55.88.226` |
 | 部署根目录 | `/opt/minigames` |
-| 当前代码目录 | `/opt/minigames/current`，指向 `releases/20260918-111911` |
+| 当前代码目录 | `/opt/minigames/current`，指向 `releases/20260918-120949` |
 | Compose 项目 / 容器 | `minigames` / `minigames-app` |
-| 镜像 | `minigames:20260918-111911` |
+| 镜像 | `minigames:20260918-120949` |
 | 容器环境 | Node.js 24.21.0，Debian bookworm slim，非 root 用户 |
 | 容器监听 / 主机映射 | `8080` / `127.0.0.1:5178` |
 | HTTPS 入口 | 既有 systemd Caddy，80/443，新增独立域名路由 |
@@ -38,13 +38,21 @@ pnpm release:package
 
 发布包路径、版本和 SHA-256 记录在 `.deploy/latest.json`。包中只有构建结果、锁定运行资源和部署配置，不包含 `node_modules`、开发源码、ROM 或存档。Mac 发布归档关闭扩展属性和 AppleDouble 元数据。
 
-本次归档：`minigames-20260918-111911.tar.gz`（1,652,637 字节），SHA-256：
+本次触控修复归档：`minigames-20260918-120949.tar.gz`（1,653,186 字节），SHA-256：
+
+```text
+13e666f7fa0af8e5676726c633d17f9c46b0bcd58f39bd3ebdd5ba0d2fb04f39
+```
+
+已在服务器核对摘要并通过 Docker 健康检查；上一版本 `20260918-111911` 保留供回滚。
+
+上一联机版本归档：`minigames-20260918-111911.tar.gz`（1,652,637 字节），SHA-256：
 
 ```text
 450e02ac2b5f6b7bc48dc8707fd7223816667e33723a7128e511f1d240717113
 ```
 
-上传后已在服务器用 `sha256sum` 核对；发布包不包含 ROM、存档、密钥或开发目录。上一版本 `20260915-105326` 的镜像和目录保留，可回滚；本次没有修改游戏数据和 Caddy 其他站点配置。
+所有发布包均在服务器用 `sha256sum` 核对，不包含 ROM、存档、密钥或开发目录。首次版本 `20260915-105326` 的镜像和目录也仍保留；上述发布没有修改游戏数据和 Caddy 其他站点配置。
 
 首次发布归档：`minigames-20260915-105326.tar.gz`，SHA-256：
 
@@ -131,6 +139,16 @@ Caddy 自动申请和续期证书并将 HTTP 跳转到 HTTPS；依赖公网 DNS 
 当前 ROM 在 H5 内同源下载，原生页面仅使用 request 与 web-view；尚未增加原生 `wx.downloadFile`。微信后台设置、业务域名资格及真机测试未由本次服务器部署代为完成。
 
 ## 验收与存档迁移
+
+### 2026-09-18 iOS 触控修复（20260918-120949）
+
+游戏操作区统一防误缩放，菜单等按钮禁止原生文字选择和长按浮层；单机、联机复用相同处理，菜单滚动、音量和房间号编辑保留。实现及测试范围见[手机界面记录](mobile-ui-implementation.md)。
+
+通过正式 HTTPS 域名运行 `PLAYWRIGHT_BASE_URL=https://minigames.19ba.cn pnpm test:touch`：Chrome/WebKit 共 5 项通过、1 项跳过，包括连续 12 次 A 键的按下/释放、保持缩放为 1、多指移动、菜单长按、音量与房间号操作。WebKit 的多指 CDP 注入项跳过，该项只在 Chrome 执行；没有将桌面 WebKit 移动视口测试视为 iOS 微信真机验收。
+
+同版本线上双人＋观战回归通过（26.6 秒），覆盖按键、暂停恢复、房主与来宾重连、状态一致性和房主退出。
+
+容器健康且公网 `/api/health` 返回 `20260918-120949`。旧网页需要退出后重新进入，才能加载此次带新文件指纹的脚本与样式；此项 H5 修复不要求用户清除存档或重新安装小程序。
 
 ### 2026-09-18 联机版本
 

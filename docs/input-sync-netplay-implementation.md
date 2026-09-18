@@ -1,6 +1,6 @@
 # 输入帧同步联机实现与验收
 
-2026-09-18。已按确认的「不传音视频」路线完成测试版，并按追加授权推送 GitHub、部署 Docker。每端运行同一 ROM，服务端排序和转发输入，浏览器在本地生成画面与声音。当前线上版本为 `20260918-111911`，入口为 [minigames.19ba.cn](https://minigames.19ba.cn/netplay.html?game=nes-chise-yaosai)。
+2026-09-18。已按确认的「不传音视频」路线完成测试版，并按追加授权推送 GitHub、部署 Docker。每端运行同一 ROM，服务端排序和转发输入，浏览器在本地生成画面与声音。当前线上版本为 `20260918-120949`（含 iOS 触控修复），入口为 [minigames.19ba.cn](https://minigames.19ba.cn/netplay.html?game=nes-chise-yaosai)。
 
 ## 使用方式
 
