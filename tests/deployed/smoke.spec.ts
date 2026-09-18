@@ -69,7 +69,8 @@ test('deployed service runs original ROM and restores persistent saves', async (
   await expect(page.locator('#toast')).toContainText('已读取快速存档');
   expect(await stateHash(page)).toBe(saved.stateSha256);
   await page.setViewportSize({ width: 390, height: 844 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  // Viewport fitting runs on the next animation frame after resize.
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await page.screenshot({ path: info.outputPath('player-mobile.png'), fullPage: true });
   await page.goto('/#saves');
   await expect(page.locator('.save-row')).toHaveCount(1);

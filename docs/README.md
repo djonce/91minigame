@@ -1,6 +1,6 @@
 **ROM 游戏播放器开发文档**
 
-最新进展（2026-09-18）：手机界面优化及不传音视频的好友联机测试版均已在本地实现，线上尚未更新。参见[手机界面验收](mobile-ui-implementation.md)和[输入帧同步联机实现与验收](input-sync-netplay-implementation.md)。
+最新进展（2026-09-18）：手机界面优化及不传音视频的好友联机测试版已完成并部署至正式域名，版本 `20260918-111911`。参见[手机界面验收](mobile-ui-implementation.md)和[输入帧同步联机实现与验收](input-sync-netplay-implementation.md)。
 
 联机补充（2026-09-18，方案阶段）：[三人联机与四席位扩展](multiplayer-architecture-plan.md)，区分三人同时操作、二人操作加观战和轮换，补充 ROM 限制、稳定席位、输入权限、带宽及三机验收。
 
