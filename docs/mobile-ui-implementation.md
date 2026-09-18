@@ -2,6 +2,20 @@
 
 日期：2026-09-18。范围：用户确认的手机界面优化（规划 A）。本地实现完成，并随版本 `20260918-111911` 发布到 `minigames.19ba.cn`，新界面的 iOS 微信真机验收待进行。随后确认开发的输入帧同步联机也已上线，见[联机实现记录](input-sync-netplay-implementation.md)。
 
+## iOS 连点缩放与菜单选中修复
+
+用户在 iOS 真机上反馈：按键容易触发页面放大，菜单按钮容易被选中。此前只有方向盘和部分手柄按钮设置禁止缩放及选中，菜单按钮和手柄之间的空白区域没有完整覆盖。
+
+修复将 `touch-action: none` 应用于整个游戏操作区，并对该区域及播放器按钮设置 WebKit 的禁止选中、长按浮层和原生拖动样式。新增 `src/player-gestures.ts`：保留 Pointer Events 驱动的按键输入，同时取消手柄上的原生 touch 默认行为和游戏区的 WebKit 手势；菜单按钮拦截选中与上下文菜单。单机和联机共同使用这套处理。
+
+拦截范围不包含滚动菜单、音量滑块和房间号输入框，仍可滚动、编辑和复制文字。没有全局关闭 viewport 缩放或移除键盘焦点标识。依据：[WebKit 触控行为说明](https://webkit.org/blog/5610/more-responsive-tapping-on-ios/)与[Apple CSS 属性参考](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariCSSRef/Articles/StandardCSSProperties.html)。
+
+本地验证：原有 4 项手机布局、输入及存档浏览器测试通过；新增 Chrome 的真实连点、多指移动、长按、菜单操作检查通过。跨浏览器触控套件共 5 项通过、1 项跳过：WebKit 通过连点与手势/选中边界检查，CDP 多指注入只在 Chrome 执行，未把它计作 WebKit 多指验收。实际按键按下/释放仍进入真实核心，连点后缩放为 1，方向+A 释放后无卡键，音量和输入框保持可用。
+
+复现：先执行 `PLAYWRIGHT_BROWSERS_PATH=.runtime/playwright pnpm exec playwright install webkit`，然后运行 `pnpm test:touch`。这些是桌面 Chrome/WebKit 的移动视口测试，修复后的 iOS 微信真机表现仍需用户复测。发布状态见[部署记录](deployment.md)。
+
+以下章节保留最初界面改版的实现和验收记录。
+
 ## 已实现
 
 - 横屏为左手柄／中央画面／右手柄；竖屏为大画面与下方手柄。画面始终按 4:3 放入实际可用区域，不拉伸、不裁切。

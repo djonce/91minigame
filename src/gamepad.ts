@@ -1,4 +1,5 @@
 import type { Input } from './runtime-adapter';
+import { bindPlayerGestures } from './player-gestures';
 
 export function directionAt(x: number, y: number, width: number, height: number): Input[] {
   const dx = (x / width - 0.5) * 2;
@@ -29,6 +30,7 @@ export class InputSources {
 }
 
 export function bindGamepad(options: { send(button: Input, down: boolean): void; enabled(): boolean; menu(): void }) {
+  bindPlayerGestures();
   const states = new InputSources((name, down) => {
     options.send(name, down);
     const button = document.querySelector<HTMLButtonElement>(`[data-input="${name}"]`);
@@ -71,8 +73,6 @@ export function bindGamepad(options: { send(button: Input, down: boolean): void;
       timers.add(timer);
     });
   }
-  dpad.addEventListener('contextmenu', event => event.preventDefault());
-  document.querySelectorAll('.controller button').forEach(button => button.addEventListener('contextmenu', event => event.preventDefault()));
   const keys: Record<string, Input> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', KeyZ: 'b', KeyX: 'a', Enter: 'start', ShiftLeft: 'select', ShiftRight: 'select' };
   window.addEventListener('keydown', event => {
     if (event.code === 'Escape') { if (!event.repeat) options.menu(); event.preventDefault(); return; }

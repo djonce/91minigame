@@ -13,6 +13,7 @@
     "check": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit && tsc -p miniprogram/tsconfig.json --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",
+    "test:touch": "PLAYWRIGHT_BROWSERS_PATH=.runtime/playwright playwright test -c playwright.touch.config.ts",
     "test:netplay:soak": "node scripts/test-netplay-soak.mjs",
     "test:production": "pnpm build && node --import tsx --test tests/deployment/*.test.ts",
     "test:deployed": "playwright test -c playwright.production.config.ts",
