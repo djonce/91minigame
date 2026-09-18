@@ -16,7 +16,10 @@ export async function runtimeManifest(): Promise<RuntimeManifest | null> {
   }
   catch { return null; }
 }
-export interface LocalEntry { id: string; title: string; path: string }
+export interface LocalEntry {
+  id: string; title: string; path: string;
+  netplay?: { sha256: string; players: number; controller: 'nes-2pad' | 'nes-four-score'; fps: number };
+}
 export async function entries(): Promise<LocalEntry[]> {
   try {
     const value: unknown = JSON.parse(await readFile(catalogPath, 'utf8'));
@@ -34,10 +37,19 @@ export async function loadGame(entry: LocalEntry, runtime: RuntimeManifest | nul
   const bytes = await readFile(entry.path);
   const inspection = inspectNes(bytes);
   const sha256 = createHash('sha256').update(bytes).digest('hex');
+  const candidate = entry.netplay;
+  const known = sha256 === '98ed6d10391cccef249ce45cd935eb6263163f727fbf2fc11adb8116aa49f31d'
+    ? { players: 2, fps: 60.0988, controller: 'nes-2pad' as const } : undefined;
+  // Operator configuration is explicitly bound to bytes; replacing a ROM must
+  // not silently inherit a previous game's multiplayer capacity.
+  if (candidate && (!/^[a-f0-9]{64}$/.test(candidate.sha256) || ![2, 3, 4].includes(candidate.players) || !['nes-2pad', 'nes-four-score'].includes(candidate.controller) || ![50, 60.0988].includes(candidate.fps) || (candidate.players > 2 && candidate.controller !== 'nes-four-score'))) throw new Error('Invalid netplay catalog configuration');
+  const netplay = candidate ? candidate.sha256 === sha256 ? candidate : undefined : known;
   return { bytes, game: {
     id: entry.id, title: entry.title || basename(entry.path, '.nes'), system: 'NES',
     description: '插入熟悉的卡带，回到纯粹的游玩时光。', sha256, sizeBytes: bytes.length, inspection,
     romUrl: `/api/roms/${encodeURIComponent(entry.id)}?sha=${sha256}`,
     runtimeProfileId: runtime?.profileId || 'runtime-not-installed', available: Boolean(runtime),
+    // Capacity is tied to the verified ROM, never inferred from the extension.
+    ...(netplay ? { netplay: { players: netplay.players, fps: netplay.fps, controller: netplay.controller, validation: 'experimental' as const } } : {}),
   } };
 }

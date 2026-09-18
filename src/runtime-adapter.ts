@@ -2,15 +2,29 @@ import type { Game, RuntimeManifest } from '../shared/types';
 import { loadRom } from './storage';
 
 // Version-bound internals are intentionally confined here. See docs/local-development.md.
-interface Ejs423 {
+export interface Ejs423 {
   started: boolean; paused: boolean; canvas: HTMLCanvasElement;
   pause(): void; play(): void; setVolume(value: number): void;
-  Module: { AL?: { currentCtx?: { audioCtx?: AudioContext } } };
+  initGameCore(js: Uint8Array, wasm: Uint8Array, thread?: Uint8Array): void;
+  startButtonClicked(button: Element): void;
+  startGame(): void;
+  elements: { parent: HTMLElement };
+  checkStarted(): void;
+  retroarchOpts?: { name: string; default: string | number | boolean; isString?: boolean }[];
+  Module: {
+    AL?: { currentCtx?: { audioCtx?: AudioContext } };
+    pauseMainLoop(): void;
+    _toggleMainLoop(running: number): void;
+    callMain(args: string[]): unknown;
+    HEAPU8: Uint8Array;
+    _free(pointer: number): void;
+    netplayIterate?(): Promise<void>;
+  };
   gameManager: {
     getState(): Uint8Array; loadState(state: Uint8Array): void; restart(): void;
     simulateInput(player: number, index: number, value: number): void;
     FS: { unlink(path: string): void; readFile(path: string): Uint8Array };
-    functions: { getFrameNum(): number; screenshot(): void };
+    functions: { getFrameNum(): number; screenshot(): void; saveStateInfo(): string };
   };
 }
 type EjsWindow = Window & typeof globalThis & { EJS_emulator?: Ejs423; [key: `EJS_${string}`]: unknown };
@@ -26,7 +40,7 @@ export class RuntimeAdapter {
   private localFetch?: typeof fetch;
   private screenshotPending?: Promise<Blob | undefined>;
   private cachedScreenshot?: { frame: number; blob: Blob };
-  async prepare(game: Game, progress: (message: string) => void): Promise<void> {
+  async prepare(game: Game, progress: (message: string) => void, hooks?: { ready(ejs: Ejs423, fail: (error: Error) => void): void }): Promise<void> {
     if (this.attempted) throw new Error('请重新加载页面后重试。');
     this.attempted = true;
     const signal = this.controller.signal;
@@ -60,7 +74,10 @@ export class RuntimeAdapter {
           EJS_player: '#emulator', EJS_core: 'fceumm', EJS_pathtodata: base + 'data/',
           EJS_gameUrl: new File([new Uint8Array(bytes).buffer], `${game.id}.nes`),
           EJS_gameName: `${game.id}-${game.sha256.slice(0, 12)}`, EJS_gameID: game.id,
-          EJS_startOnLoaded: true, EJS_forceLegacyCores: true, EJS_threads: false,
+          EJS_startOnLoaded: !hooks, EJS_forceLegacyCores: true, EJS_threads: false,
+          EJS_ready: hooks ? () => {
+            try { hooks.ready(host.EJS_emulator!, reject); } catch (error) { reject(error); }
+          } : undefined,
           EJS_language: 'en-US', EJS_disableAutoLang: false, EJS_noAutoFocus: true,
           EJS_volume: 0.65, EJS_color: '#b9dc85', EJS_backgroundColor: '#141b15',
           EJS_disableDatabases: true, EJS_disableLocalStorage: true,
@@ -84,6 +101,8 @@ export class RuntimeAdapter {
     } finally { clearTimeout(timeout); }
   }
   get ready() { return Boolean(this.emulator); }
+  /** Version-bound access for the isolated deterministic player. */
+  get netplayEngine() { return this.require(); }
   get paused() { return this.emulator?.paused ?? true; }
   get frame() { return this.require().gameManager.functions.getFrameNum(); }
   private require() { if (!this.emulator) throw new Error('游戏尚未准备好。'); return this.emulator; }

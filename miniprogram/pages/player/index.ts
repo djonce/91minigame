@@ -4,7 +4,7 @@ Page({
   data: { src: '', showWebView: false, error: '', local: config.mode === 'local' },
   onLoad(query: Record<string, string | undefined>) {
     if (!query.id) { this.setData({ error: '缺少游戏信息。' }); return; }
-    const src = playerUrl(query.id);
+    const src = playerUrl(query.id, query.mode === 'netplay');
     if (config.mode === 'https' && !/^https:\/\//.test(src)) { this.setData({ error: '正式接入必须配置 HTTPS 播放器地址。' }); return; }
     this.setData({ src, showWebView: config.mode === 'https' });
   },

@@ -20,6 +20,7 @@ export interface Game {
   romUrl: string;
   runtimeProfileId: string;
   available: boolean;
+  netplay?: { players: number; fps: number; controller: 'nes-2pad' | 'nes-four-score'; validation: 'experimental' };
 }
 export interface RuntimeManifest {
   version: string;

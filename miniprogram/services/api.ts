@@ -1,5 +1,5 @@
 import { config } from '../config';
-export interface LocalGame { id: string; title: string; system: string; sizeBytes: number; sha256: string; description: string; available: boolean }
+export interface LocalGame { id: string; title: string; system: string; sizeBytes: number; sha256: string; description: string; available: boolean; netplay?: { players: number } }
 export function request<T>(path: string): Promise<T> {
   return new Promise((resolve, reject) => wx.request({
     url: config.apiOrigin + path, method: 'GET', timeout: 10000,
@@ -9,6 +9,6 @@ export function request<T>(path: string): Promise<T> {
       : '连接不上游戏服务，请检查网络、HTTPS 证书及小程序合法域名配置。')),
   }));
 }
-export function playerUrl(id: string) {
-  return `${config.playerOrigin}/player.html?game=${encodeURIComponent(id)}&source=wechat`;
+export function playerUrl(id: string, netplay = false) {
+  return `${config.playerOrigin}/${netplay ? 'netplay' : 'player'}.html?game=${encodeURIComponent(id)}&source=wechat`;
 }

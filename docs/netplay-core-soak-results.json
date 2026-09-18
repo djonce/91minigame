@@ -1,0 +1,45 @@
+{
+  "date": "2026-09-18",
+  "environment": "macOS / Chrome, two isolated browser contexts",
+  "scope": "deterministic core probe, not network or iOS validation",
+  "romSha256": "98ed6d10391cccef249ce45cd935eb6263163f727fbf2fc11adb8116aa49f31d",
+  "coreSha256": "f1054b094e7149fd6278485bc1b2e51ff75c5259048ddb1134171e53d651f239",
+  "passed": true,
+  "frames": 72000,
+  "instances": 2,
+  "checkpoints": 120,
+  "elapsedChunkMs": 1196143.1,
+  "firstCheckpoint": [
+    {
+      "frame": 600,
+      "rawBefore": 1,
+      "rawAfter": 601,
+      "hash": "d6692abdfcd73ffc8e8a6c31370ba8e85df9e1f153c13235b0dff9557761024d",
+      "ms": 9932.60000000149
+    },
+    {
+      "frame": 600,
+      "rawBefore": 1,
+      "rawAfter": 601,
+      "hash": "d6692abdfcd73ffc8e8a6c31370ba8e85df9e1f153c13235b0dff9557761024d",
+      "ms": 9949.699999999255
+    }
+  ],
+  "lastCheckpoint": [
+    {
+      "frame": 72000,
+      "rawBefore": 71401,
+      "rawAfter": 72001,
+      "hash": "beaa7da37e3fc4869430a16ec9c9b9b97e834943154f6d72ba0350df9925d112",
+      "ms": 9967
+    },
+    {
+      "frame": 72000,
+      "rawBefore": 71401,
+      "rawAfter": 72001,
+      "hash": "beaa7da37e3fc4869430a16ec9c9b9b97e834943154f6d72ba0350df9925d112",
+      "ms": 9955.300000000745
+    }
+  ],
+  "note": "Run preceded the explicit P3/P4 device override and snapshot buffer release; subsequent final-code core and end-to-end regressions verified those changes."
+}

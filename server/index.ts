@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { resolve, extname, sep } from 'node:path';
 import { entries, loadGame, root, runtimeRoot, runtimeManifest } from './catalog.js';
 import { mime, staticAssets } from './static.js';
+import { installNetplay } from './netplay.js';
 
 const port = Number(process.env.PORT || 5173);
 const host = process.env.HOST || '127.0.0.1';
@@ -100,9 +101,11 @@ const server = createServer(async (request, response) => {
     json(response, { error: 'RESOURCE_ERROR', message: production ? '资源暂不可用，请稍后重试。' : '本地资源无法读取，请检查终端日志。' }, error instanceof URIError ? 400 : 500);
   }
 });
+const closeNetplay = installNetplay(server);
 server.listen(port, host, () => { const address = server.address(); console.log(`像素游乐室 (${production ? 'production' : 'development'}) http://${host}:${typeof address === 'object' && address ? address.port : port}`); });
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => {
   const deadline = setTimeout(() => process.exit(1), 10000); deadline.unref();
+  closeNetplay();
   server.close(() => { void (vite?.close() || Promise.resolve()).then(() => process.exit(0)); });
   server.closeIdleConnections();
 });

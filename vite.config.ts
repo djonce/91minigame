@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         library: resolve(import.meta.dirname, 'index.html'),
         player: resolve(import.meta.dirname, 'player.html'),
+        netplay: resolve(import.meta.dirname, 'netplay.html'),
       },
     },
   },

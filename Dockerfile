@@ -2,6 +2,7 @@ FROM node:24-bookworm-slim@sha256:2fe369e969550cde8e867afc3fe370b260140cab4a23d4
 WORKDIR /app
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=8080 APP_ROOT=/app CATALOG_PATH=/data/games.json VERIFICATION_DIR=/data/verification
 COPY --chown=node:node package.json ./
+RUN npm install --omit=dev --ignore-scripts --no-package-lock
 COPY --chown=node:node build/ ./build/
 COPY --chown=node:node dist/ ./dist/
 COPY --chown=node:node config/runtime-lock.json ./config/runtime-lock.json
