@@ -2,7 +2,7 @@
   "description": "像素游乐室：微信入口与独立 ROM 播放器，本地开发工程",
   "miniprogramRoot": "miniprogram/",
   "compileType": "miniprogram",
-  "appid": "wx7786ac37a08ec8ee",
+  "appid": "wx8b65e744a35e9b19",
   "projectname": "pixel-room-local",
   "libVersion": "3.7.12",
   "setting": {
@@ -43,5 +43,6 @@
   },
   "condition": {},
   "simulatorPluginLibVersion": {},
-  "editorSetting": {}
+  "editorSetting": {},
+  "isGameTourist": false
 }

@@ -1,0 +1,8 @@
+像素游乐室头像 v1
+
+生成方式：内置 image_gen 工具。使用 macOS sips 导出为 144×144 像素 PNG。
+设计：深绿背景、浅绿复古街机、像素笑脸、摇杆与双按钮；无文字。
+成品：pixel-playroom-avatar-v1-144.png
+
+Final generation prompt:
+Use case: logo-brand. Create ONE finished original avatar image for a Chinese retro ROM gaming mini-program named 像素游乐室 (Pixel Playroom). Output a square PNG artwork, designed to remain immediately recognizable when exported at 144 by 144 pixels. No text or lettering at all. Design: a charming compact retro arcade cabinet viewed mostly from the front, a simple chunky pixel-art silhouette, a bright pale-lime screen containing a tiny friendly smile made of bold square pixels, one small ball-top joystick and two round action buttons on its control deck. It should read as an arcade machine, not a phone or a robot. Keep details few and large. Cohesive palette matching the existing app: solid deep forest green background #171c19, pale lime #c7e696 and cream highlights, muted sage #748e5b shading. A sophisticated cheerful nostalgic 8-bit brand mark, crisp stepped pixel edges, flat color blocks with restrained two-tone shading, carefully balanced geometry, no blur, no photorealism, no busy texture, no soft glow. One centered cabinet occupying about 70–75% of the image; keep every essential element inside the central circular safe area so a circle-cropped avatar works. Full-bleed opaque green background, no white outer margins, no mockup or collage. No existing brands or copyrighted characters. No political imagery, flags, leaders, military insignia, weapons, nudity, sexual content, or watermarks. Deliver only the finished single avatar graphic.
