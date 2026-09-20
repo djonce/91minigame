@@ -13,4 +13,5 @@ Page({
   },
   openGame(event: WechatMiniprogram.TouchEvent) { wx.navigateTo({ url: `/pages/detail/index?id=${encodeURIComponent(event.currentTarget.dataset.id)}` }); },
   settings() { wx.navigateTo({ url: '/pages/settings/index' }); },
+  nativeTest() { wx.navigateTo({ url: '/pages/native-nes/index?id=nes-chise-yaosai' }); },
 });

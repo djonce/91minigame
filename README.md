@@ -4,6 +4,8 @@ ROM 游戏播放器、游戏资源服务与微信小程序入口。使用固定�
 
 服务器使用 Docker 部署，目标地址为 [minigames.19ba.cn](https://minigames.19ba.cn)。发布版本、HTTPS 验收状态与运维命令见 [服务器部署说明](docs/deployment.md)。
 
+新增独立的 **原生 NES 验证页**：执行 `pnpm wechat:build`，重新编译小程序，在首页点击「原生 NES 验证 ↗」。使用原生 Canvas + JSNES，不需要 web-view 业务域名；真机需配置 `https://minigames.19ba.cn` 为 request 合法域名。入口、范围和真机检查步骤见 [原生 NES 验证说明](docs/native-nes-validation.md)。
+
 ## 本地启动
 
 需要 Node.js 20.11+、pnpm。首次准备：

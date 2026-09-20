@@ -8,10 +8,10 @@
   },
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "tsc --noEmit && vite build && tsc -p tsconfig.server.json && tsc -p miniprogram/tsconfig.json",
+    "build": "tsc --noEmit && vite build && tsc -p tsconfig.server.json && pnpm wechat:build",
     "start": "NODE_ENV=production node build/server/index.js",
     "check": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit && tsc -p miniprogram/tsconfig.json --noEmit",
-    "test": "node --import tsx --test tests/*.test.ts",
+    "test": "pnpm native:bundle && node --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",
     "test:touch": "PLAYWRIGHT_BROWSERS_PATH=.runtime/playwright playwright test -c playwright.touch.config.ts",
     "test:netplay:soak": "node scripts/test-netplay-soak.mjs",
@@ -21,14 +21,18 @@
     "runtime:setup": "node scripts/setup-runtime.mjs",
     "runtime:verify": "node scripts/verify-runtime.mjs",
     "rom:add": "tsx scripts/add-rom.ts",
-    "wechat:build": "tsc -p miniprogram/tsconfig.json",
-    "wechat:open": "pnpm wechat:build && /Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project ."
+    "wechat:build": "pnpm native:bundle && tsc -p miniprogram/tsconfig.json",
+    "wechat:open": "pnpm wechat:build && /Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project .",
+    "native:bundle": "node scripts/build-native-core.mjs"
   },
   "packageManager": "pnpm@10.14.0",
   "devDependencies": {
+    "@noble/hashes": "1.8.0",
     "@playwright/test": "1.58.2",
     "@types/node": "^20.19.43",
     "@types/ws": "8.18.1",
+    "esbuild": "0.25.12",
+    "jsnes": "2.1.0",
     "miniprogram-api-typings": "^4.1.3",
     "tsx": "^4.23.13",
     "typescript": "5.8.3",

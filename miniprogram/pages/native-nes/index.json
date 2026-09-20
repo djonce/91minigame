@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "原生 NES 验证",
+  "navigationBarBackgroundColor": "#171e19",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#171e19",
+  "pageOrientation": "auto",
+  "disableScroll": true,
+  "usingComponents": {}
+}

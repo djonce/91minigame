@@ -7,5 +7,6 @@ Page({
     catch (error) { this.setData({ error: error instanceof Error ? error.message : '读取失败。' }); }
   },
   play() { if (this.data.game) wx.navigateTo({ url: `/pages/player/index?id=${encodeURIComponent(this.data.game.id)}` }); },
+  nativeTest() { if (this.data.game) wx.navigateTo({ url: `/pages/native-nes/index?id=${encodeURIComponent(this.data.game.id)}` }); },
   netplay() { if (this.data.game?.netplay) wx.navigateTo({ url: `/pages/player/index?id=${encodeURIComponent(this.data.game.id)}&mode=netplay` }); },
 });

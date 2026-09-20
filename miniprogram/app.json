@@ -1,5 +1,5 @@
 {
-  "pages": ["pages/library/index", "pages/detail/index", "pages/player/index", "pages/settings/index"],
+  "pages": ["pages/library/index", "pages/detail/index", "pages/player/index", "pages/settings/index", "pages/native-nes/index"],
   "window": { "navigationBarTitleText": "像素游乐室", "navigationBarBackgroundColor": "#f6f4ed", "navigationBarTextStyle": "black", "backgroundColor": "#f6f4ed" },
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",

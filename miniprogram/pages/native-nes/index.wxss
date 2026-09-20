@@ -1,0 +1,40 @@
+page{background:#171e19;color:#dfe8d4;overflow:hidden}
+.native-player{height:100%;-webkit-user-select:none;user-select:none}
+.topbar{height:44px;padding:0 14px;display:flex;align-items:center;gap:10px;box-sizing:border-box}
+.game-title{font-size:14px;font-weight:600;white-space:nowrap}
+.live-stat{flex:1;min-width:0;color:#9caa90;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menu-button{margin:0;padding:0 12px;line-height:32px;font-size:12px;background:#2b3728;color:#dce9c7;border-radius:9px}
+.playfield{position:relative;overflow:hidden}
+.screen-shell{position:absolute;overflow:hidden;background:#050806;border-radius:6px}
+.screen{display:block;position:relative;z-index:0;image-rendering:pixelated}
+.screen-overlay{position:absolute;left:0;top:0;width:100%;height:100%;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,8,6,.76);padding:16px;box-sizing:border-box;text-align:center}
+.overlay-label{font-size:16px;font-weight:600;color:#e2ebd8}
+.overlay-tip{font-size:11px;color:#9ba990;margin-top:12px}
+.error-message{font-size:12px;color:#f2cbb2;line-height:1.7;margin-top:12px;word-break:break-all}
+.start-game{padding:0 24px;margin:18px 0 0;line-height:44px;border-radius:12px;background:#c9e698;color:#25351c;font-size:15px;font-weight:600}
+.stick-base{position:absolute;border-radius:50%;background:#242f25;box-shadow:inset 0 0 0 2px #3a4932;color:#728465;touch-action:none}
+.stick-ring{position:absolute;left:17%;top:17%;width:66%;height:66%;border:1px solid #47573b;border-radius:50%;box-sizing:border-box}
+.stick-cap{position:absolute;left:29%;top:29%;width:42%;height:42%;background:#9eb985;border:2px solid #b9d393;border-radius:50%;box-sizing:border-box;box-shadow:0 5px 0 #4c603a}
+.north,.south,.east,.west{position:absolute;font-size:11px;line-height:16px}
+.north{top:5%;left:46%}.south{bottom:5%;left:46%}.west{left:5%;top:44%}.east{right:5%;top:44%}
+.action-buttons{position:absolute}
+.action{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#c9e698;color:#2f421f;font-size:29px;font-weight:700;box-shadow:0 5px 0 #718951;touch-action:none}
+.action-a{right:0;top:0}.action-b{left:0;bottom:5px}
+.pressed{background:#a2be78;box-shadow:0 2px 0 #506236;transform:translateY(3px)}
+.transport{position:absolute;display:flex;align-items:center;justify-content:center;gap:12px}
+.small-key{display:flex;flex:1;height:35px;align-items:center;justify-content:center;font-size:11px;background:#303e2c;color:#c3d5b0;border:1px solid #516343;border-radius:15px;box-shadow:0 3px 0 #0a100c;touch-action:none}
+.small-key.pressed{background:#567047}
+.inactive{opacity:.65}
+.menu-shade{position:fixed;left:0;top:0;width:100%;height:100%;z-index:20;background:rgba(6,10,7,.8);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.menu-scroll{max-height:100%;width:100%;max-width:420px;border-radius:20px;background:#222e23}
+.menu-panel{padding:20px;box-sizing:border-box}
+.menu-heading{display:flex;align-items:center;justify-content:space-between;font-size:21px;font-weight:600}
+.dismiss{margin:0;padding:0 10px;color:#c3d5b0;background:#35452f;line-height:32px;font-size:12px}
+.menu-caption{font-size:12px;color:#a4b497;line-height:1.7;margin-top:8px}
+.menu-panel .start-game{width:100%}
+.menu-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.menu-action{width:calc(50% - 5px);margin:0;background:#35452f;color:#e0ebd3;font-size:14px;line-height:42px;border-radius:10px}
+.native-disabled{opacity:.4;color:#c3d5b0;background:#35452f}
+.diagnostics{margin-top:18px;padding-top:14px;border-top:1px solid #42533a;color:#9eae94;font-size:11px;line-height:1.9;word-break:break-all}
+.audio-note{font-size:12px;color:#eed1a7;line-height:1.7;margin-top:12px}
+.copy-report{margin:14px 0 0;background:#35452f;color:#c3d5b0;font-size:12px;line-height:38px}

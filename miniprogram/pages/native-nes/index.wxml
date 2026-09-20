@@ -1,0 +1,59 @@
+<view class="native-player" catchtouchmove="swallow">
+  <view class="topbar">
+    <text class="game-title">{{title}}</text>
+    <text class="live-stat">{{running ? fps + ' FPS' : status}}</text>
+    <button class="menu-button" bindtap="openMenu">☰ 菜单</button>
+  </view>
+  <view class="playfield {{layout.wide ? 'landscape' : 'portrait'}}" style="{{fieldStyle}}">
+    <view class="screen-shell" style="{{layout.screen}}">
+      <canvas id="nes-screen" type="2d" class="screen" hidden="{{(!loading && !running) || menuOpen}}" style="width:{{layout.screenWidth}}px;height:{{layout.screenHeight}}px;" disable-scroll="{{true}}"></canvas>
+      <view wx:if="{{!running}}" class="screen-overlay">
+        <text class="overlay-label">{{loading ? '正在加载卡带…' : error ? '暂时无法运行' : frames ? '暂停一下，接着玩' : '原生 NES · 单机验证'}}</text>
+        <text wx:if="{{error}}" class="error-message">{{error}}</text>
+        <button wx:if="{{ready}}" class="start-game" disabled="{{busy}}" bindtap="start">{{busy ? '正在启动…' : frames ? '继续游戏' : '开始验证'}}</button>
+        <button wx:elif="{{error}}" class="start-game" bindtap="loadRom">重新加载</button>
+        <text wx:if="{{ready && !frames}}" class="overlay-tip">进入后按 START 开始游戏</text>
+      </view>
+    </view>
+    <view id="native-stick" class="stick-base {{running ? '' : 'inactive'}}" style="{{layout.stick}}"
+      catchtouchstart="stickStart" catchtouchmove="stickMove" catchtouchend="touchEnd" catchtouchcancel="touchEnd" aria-label="八方向摇杆">
+      <text class="north">▲</text><text class="east">▶</text><text class="south">▼</text><text class="west">◀</text>
+      <view class="stick-ring"></view>
+      <view class="stick-cap" style="transform:translate({{stickX}}px,{{stickY}}px);"></view>
+    </view>
+    <view class="action-buttons {{running ? '' : 'inactive'}}" style="{{layout.actions}}">
+      <view class="action action-a {{pressed.a ? 'pressed' : ''}}" style="width:{{layout.actionSize}}px;height:{{layout.actionSize}}px;"
+        data-input="a" catchtouchstart="buttonStart" catchtouchmove="swallow" catchtouchend="touchEnd" catchtouchcancel="touchEnd" aria-label="A 按钮">A</view>
+      <view class="action action-b {{pressed.b ? 'pressed' : ''}}" style="width:{{layout.actionSize}}px;height:{{layout.actionSize}}px;"
+        data-input="b" catchtouchstart="buttonStart" catchtouchmove="swallow" catchtouchend="touchEnd" catchtouchcancel="touchEnd" aria-label="B 按钮">B</view>
+    </view>
+    <view class="transport {{running ? '' : 'inactive'}}" style="{{layout.transport}}">
+      <view class="small-key {{pressed.select ? 'pressed' : ''}}" data-input="select" catchtouchstart="buttonStart" catchtouchmove="swallow" catchtouchend="touchEnd" catchtouchcancel="touchEnd">SELECT</view>
+      <view class="small-key {{pressed.start ? 'pressed' : ''}}" data-input="start" catchtouchstart="buttonStart" catchtouchmove="swallow" catchtouchend="touchEnd" catchtouchcancel="touchEnd">START</view>
+    </view>
+  </view>
+  <view wx:if="{{menuOpen}}" class="menu-shade" catchtouchmove="swallow">
+    <scroll-view class="menu-scroll" scroll-y="{{true}}">
+      <view class="menu-panel">
+        <view class="menu-heading"><text>游戏暂停</text><button class="dismiss" bindtap="closeMenu">关闭</button></view>
+        <view class="menu-caption">原生 NES 验证 · 单人</view>
+        <button class="start-game {{!ready || busy ? 'native-disabled' : ''}}" disabled="{{!ready || busy}}" bindtap="start">继续游戏</button>
+        <view class="menu-actions">
+          <button class="menu-action {{!ready ? 'native-disabled' : ''}}" disabled="{{!ready}}" bindtap="save">保存快存</button>
+          <button class="menu-action {{!hasSave ? 'native-disabled' : ''}}" disabled="{{!hasSave}}" bindtap="restore">读取快存</button>
+          <button class="menu-action" bindtap="toggleSound">声音 {{sound ? '开' : '关'}}</button>
+          <button class="menu-action {{!ready ? 'native-disabled' : ''}}" disabled="{{!ready}}" bindtap="restart">重新开局</button>
+        </view>
+        <view class="menu-caption">{{hasSave ? '快存：' + saveLabel : '还没有原生快存'}}</view>
+        <view wx:if="{{audioNote}}" class="audio-note">{{audioNote}}</view>
+        <view class="diagnostics">
+          <view>核心 {{profile}}</view>
+          <view>累计 {{frames}} 帧 · 音频断供 {{underruns}} 次</view>
+          <view>旋转屏幕或切回微信后，点击继续。</view>
+          <view>快存仅属于此原生版本，与网页存档分开。</view>
+        </view>
+        <button class="copy-report" bindtap="copyReport">复制真机测试信息</button>
+      </view>
+    </scroll-view>
+  </view>
+</view>
