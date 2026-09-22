@@ -11,7 +11,7 @@ test('native page loads, pauses, saves, re-enters, restores and ignores a dispos
   const source = buildSync({ entryPoints: ['miniprogram/pages/native-nes/index.ts'], bundle: true, format: 'cjs', platform: 'browser', write: false }).outputFiles[0].text;
   const files = new Map<string, string>();
   const rom = controllerRom(), sha = digest(rom);
-  let now = 0, drawn = 0, keepAwake = false;
+  let now = 0, drawn = 0, keepAwake = false, updates = 0;
   let pendingDownload: (() => void) | undefined;
   let holdDownload = false;
   let aborted = false;
@@ -55,6 +55,7 @@ test('native page loads, pauses, saves, re-enters, restores and ignores a dispos
       Page: (definition: any) => { page = definition; },
     });
     page.setData = (data: Record<string, unknown>, done?: () => void) => {
+      updates++;
       for (const [path, value] of Object.entries(data)) {
         const keys = path.split('.'); let target = page.data;
         for (const key of keys.slice(0, -1)) target = target[key];
@@ -64,12 +65,25 @@ test('native page loads, pauses, saves, re-enters, restores and ignores a dispos
     page.onLoad({ id: 'test' }); page.onReady(); return page;
   }
   async function settle() { for (let i = 0; i < 12; i++) await Promise.resolve(); }
-  function frame() { now += 1000 / 60; const list = [...callbacks.values()]; callbacks.clear(); list.forEach(callback => callback()); }
+  function frame(ms = 1000 / 60) { now += ms; const list = [...callbacks.values()]; callbacks.clear(); list.forEach(callback => callback()); }
   const page = mount(); await settle();
   assert.equal(page.data.ready, true, page.data.error);
+  assert.equal(page.data.rendererKind, '2d', 'a host without WebGL automatically mounts the fallback');
   page.data.sound = false; await page.start();
   for (let i = 0; i < 6; i++) frame();
   assert.ok(drawn > 0); assert.equal(keepAwake, true);
+  const previousFrames = page.runtime.frames, previousDrawn = drawn;
+  frame(50);
+  assert.equal(page.runtime.frames - previousFrames, 3);
+  assert.equal(drawn - previousDrawn, 1, 'catch-up frames are presented once');
+  const previousUpdates = updates;
+  for (let i = 0; i < 20; i++) {
+    const touch = { identifier: 7, clientX: 125 + i, clientY: 425 };
+    if (!i) page.stickStart({ changedTouches: [touch] }); else page.stickMove({ touches: [touch] });
+  }
+  assert.equal(updates, previousUpdates, 'touch bursts do not flood setData');
+  const input = (page.runtime.nes.toJSON() as any).controllers[1].state;
+  assert.equal(input[4] & 1, 1, 'up input reaches the emulator before the visual update');
   page.buttonStart({ currentTarget: { dataset: { input: 'a' } }, changedTouches: [{ identifier: 1, clientX: 0, clientY: 0 }] });
   frame(); page.onHide();
   assert.equal(page.data.running, false); assert.equal(callbacks.size, 0); assert.equal(keepAwake, false);

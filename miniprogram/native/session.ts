@@ -2,7 +2,7 @@ import { sha256, type NES } from './vendor/core';
 
 export const PROFILE = 'jsnes-2.1.0-native-v1';
 // Rendering patch preserves the v1 state format and existing quick saves.
-export const CORE_BUILD = 'jsnes-2.1.0-sprites1';
+export const CORE_BUILD = 'jsnes-2.1.0-perf1';
 export const FPS = 60;
 export const SAMPLE_RATE = 44100;
 export type NesState = ReturnType<NES['toJSON']>;
@@ -50,8 +50,20 @@ export class FrameClock {
   }
 }
 
-// JSNES emits BGR packed pixels; explicit bytes also work without endian assumptions.
+const littleEndian = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+const packedViews = new WeakMap<Uint8ClampedArray, Uint32Array>();
+// Canvas 2D fallback: one packed write per pixel on little-endian devices.
+// Keep explicit byte conversion for other byte orders or unaligned views.
 export function copyPixels(frame: Uint32Array, rgba: Uint8ClampedArray) {
+  if (littleEndian && rgba.byteOffset % 4 === 0) {
+    let packed = packedViews.get(rgba);
+    if (!packed) {
+      packed = new Uint32Array(rgba.buffer, rgba.byteOffset, rgba.byteLength / 4);
+      packedViews.set(rgba, packed);
+    }
+    for (let i = 0; i < 256 * 240; i++) packed[i] = frame[i] | 0xff000000;
+    return;
+  }
   for (let i = 0, p = 0; i < 256 * 240; i++, p += 4) {
     const color = frame[i];
     rgba[p] = color & 255; rgba[p + 1] = (color >>> 8) & 255;

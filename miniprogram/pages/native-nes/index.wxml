@@ -6,7 +6,8 @@
   </view>
   <view class="playfield {{layout.wide ? 'landscape' : 'portrait'}}" style="{{fieldStyle}}">
     <view class="screen-shell" style="{{layout.screen}}">
-      <canvas id="nes-screen" type="2d" class="screen" hidden="{{(!loading && !running) || menuOpen}}" style="width:{{layout.screenWidth}}px;height:{{layout.screenHeight}}px;" disable-scroll="{{true}}"></canvas>
+      <canvas wx:if="{{rendererKind === 'webgl'}}" id="nes-screen" type="webgl" class="screen" hidden="{{(!loading && !running) || menuOpen}}" style="width:{{layout.screenWidth}}px;height:{{layout.screenHeight}}px;" disable-scroll="{{true}}" binderror="canvasError"></canvas>
+      <canvas wx:else id="nes-screen" type="2d" class="screen" hidden="{{(!loading && !running) || menuOpen}}" style="width:{{layout.screenWidth}}px;height:{{layout.screenHeight}}px;" disable-scroll="{{true}}" binderror="canvasError"></canvas>
       <view wx:if="{{!running}}" class="screen-overlay">
         <text class="overlay-label">{{loading ? '正在加载卡带…' : error ? '暂时无法运行' : frames ? '暂停一下，接着玩' : '原生 NES · 单机验证'}}</text>
         <text wx:if="{{error}}" class="error-message">{{error}}</text>
@@ -49,6 +50,9 @@
         <view class="diagnostics">
           <view>核心 {{profile}}</view>
           <view>累计 {{frames}} 帧 · 音频断供 {{underruns}} 次</view>
+          <view>模拟 {{fps}} FPS · 绘制提交 {{drawFps}} FPS · {{rendererKind}}</view>
+          <view>模拟含音频 {{coreMs}} ms/帧 · 绘制提交 {{drawMs}} ms/次</view>
+          <view>最大回调间隔 {{maxGapMs}} ms {{rendererNote}}</view>
           <view>旋转屏幕或切回微信后，点击继续。</view>
           <view>快存仅属于此原生版本，与网页存档分开。</view>
         </view>
